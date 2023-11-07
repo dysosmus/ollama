@@ -12,12 +12,10 @@ COPY . .
 ENV GOARCH=$TARGETARCH
 ENV GOFLAGS=$GOFLAGS
 RUN /usr/local/go/bin/go generate ./... \
-    && /usr/local/go/bin/go build .
+    && /usr/local/go/bin/go build -o lollama ./lambda
 
 FROM ubuntu:22.04
 RUN apt-get update && apt-get install -y ca-certificates
-COPY --from=0 /go/src/github.com/jmorganca/ollama/ollama /bin/ollama
-EXPOSE 11434
-ENV OLLAMA_HOST 0.0.0.0
-ENTRYPOINT ["/bin/ollama"]
-CMD ["serve"]
+COPY --from=0 /go/src/github.com/jmorganca/ollama/lollama /bin/lollama
+RUN chmod +x /bin/lollama
+ENTRYPOINT ["/bin/lollama"]

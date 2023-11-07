@@ -3,6 +3,7 @@ module github.com/jmorganca/ollama
 go 1.20
 
 require (
+	github.com/aws/aws-lambda-go v1.41.0
 	github.com/dustin/go-humanize v1.0.1
 	github.com/emirpasic/gods v1.18.1
 	github.com/gin-gonic/gin v1.9.1
