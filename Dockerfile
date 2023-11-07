@@ -15,7 +15,7 @@ RUN /usr/local/go/bin/go generate ./... \
     && /usr/local/go/bin/go build -o lollama ./lambda
 
 FROM ubuntu:22.04
-RUN apt-get update && apt-get install -y ca-certificates
+RUN apt-get update --fix-missing && apt-get install -y ca-certificates
 COPY --from=0 /go/src/github.com/jmorganca/ollama/lollama /bin/lollama
 RUN chmod +x /bin/lollama
 ENTRYPOINT ["/bin/lollama"]
