@@ -42,7 +42,7 @@ func LambdaGenerateHandler(ctx context.Context, request events.LambdaFunctionURL
 		return ptr(""), err
 	}
 
-	workDir := "/root/.ollama/models/"
+	workDir := "/tmp/"
 
 	// TODO: set this duration from the request if specified
 	sessionDuration := defaultSessionDuration
