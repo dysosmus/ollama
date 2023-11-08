@@ -15,9 +15,10 @@ func ptr[T any](t T) *T {
 	return &t
 }
 
-func LambdaGenerateHandler(ctx context.Context, req *api.GenerateRequest) (*string, error) {
-	fmt.Println(req)
-	d, _ := json.Marshal(req)
+func LambdaGenerateHandler(ctx context.Context, req1 *api.GenerateRequest) (*string, error) {
+	fmt.Println(req1)
+	d, _ := json.Marshal(req1)
+	req := *req1
 	fmt.Println(string(d))
 	loaded.mu.Lock()
 	defer loaded.mu.Unlock()
