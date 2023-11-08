@@ -16,13 +16,16 @@ func ptr[T any](t T) *T {
 	return &t
 }
 
-func LambdaGenerateHandler(ctx context.Context, request events.LambdaFunctionURLRequest) (*string, error) {
+func LambdaGenerateHandler(ctx context.Context, request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLResponse, error) {
 	fmt.Println(request.Body)
 	fmt.Println(request.RawPath)
 	req := api.GenerateRequest{}
 	err := json.Unmarshal([]byte(request.Body), &req)
 	if err != nil {
-		return ptr(""), err
+		return events.LambdaFunctionURLResponse{
+			StatusCode: 400,
+			Body:       err.Error(),
+		}, nil
 	}
 	loaded.mu.Lock()
 	defer loaded.mu.Unlock()
@@ -37,9 +40,15 @@ func LambdaGenerateHandler(ctx context.Context, request events.LambdaFunctionURL
 
 			}))
 
-			return ptr(""), fmt.Errorf("model '%s' not found, try pulling it first", req.Model)
+			return events.LambdaFunctionURLResponse{
+				StatusCode: 400,
+				Body:       fmt.Sprintf("model '%s' not found, try pulling it first", req.Model),
+			}, nil
 		}
-		return ptr(""), err
+		return events.LambdaFunctionURLResponse{
+			StatusCode: 400,
+			Body:       err.Error(),
+		}, nil
 	}
 
 	workDir := "/tmp/"
@@ -47,14 +56,20 @@ func LambdaGenerateHandler(ctx context.Context, request events.LambdaFunctionURL
 	// TODO: set this duration from the request if specified
 	sessionDuration := defaultSessionDuration
 	if err := load(ctx, workDir, model, req.Options, sessionDuration); err != nil {
-		return ptr(""), err
+		return events.LambdaFunctionURLResponse{
+			StatusCode: 500,
+			Body:       err.Error(),
+		}, nil
 	}
 
 	checkpointLoaded := time.Now()
 
 	prompt, err := model.Prompt(req)
 	if err != nil {
-		return ptr(""), err
+		return events.LambdaFunctionURLResponse{
+			StatusCode: 500,
+			Body:       err.Error(),
+		}, nil
 	}
 
 	ch := make(chan any)
@@ -86,7 +101,10 @@ func LambdaGenerateHandler(ctx context.Context, request events.LambdaFunctionURL
 	}()
 
 	if req.Stream != nil && *req.Stream {
-		return ptr(""), fmt.Errorf("streaming not supported")
+		return events.LambdaFunctionURLResponse{
+			StatusCode: 400,
+			Body:       "streaming not supported",
+		}, nil
 	}
 
 	var response api.GenerateResponse
@@ -96,9 +114,13 @@ func LambdaGenerateHandler(ctx context.Context, request events.LambdaFunctionURL
 			generated += r.Response
 			response = r
 		} else {
-			return ptr(""), err
+			return events.LambdaFunctionURLResponse{
+				StatusCode: 500,
+				Body:       err.Error(),
+			}, nil
 		}
 	}
 	response.Response = generated
-	return ptr(generated), nil
+	o, _ := json.Marshal(response)
+	return events.LambdaFunctionURLResponse{Body: string(o), StatusCode: 200}, nil
 }
