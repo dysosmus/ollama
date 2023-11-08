@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,10 @@ func ptr[T any](t T) *T {
 	return &t
 }
 
-func LambdaGenerateHandler(ctx context.Context, req api.GenerateRequest) (*string, error) {
+func LambdaGenerateHandler(ctx context.Context, req *api.GenerateRequest) (*string, error) {
+	fmt.Println(req)
+	d, _ := json.Marshal(req)
+	fmt.Println(string(d))
 	loaded.mu.Lock()
 	defer loaded.mu.Unlock()
 
