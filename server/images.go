@@ -155,7 +155,10 @@ func GetManifest(mp ModelPath) (*ManifestV2, string, error) {
 
 func GetModel(name string) (*Model, error) {
 	mp := ParseModelPath(name)
+	fmt.Println(name)
+	fmt.Println(mp.GetFullTagname())
 	manifest, digest, err := GetManifest(mp)
+	fmt.Println(manifest)
 	if err != nil {
 		return nil, err
 	}
