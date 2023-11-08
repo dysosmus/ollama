@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/gin-gonic/gin"
 	"github.com/jmorganca/ollama/api"
 	"io/fs"
@@ -15,11 +16,14 @@ func ptr[T any](t T) *T {
 	return &t
 }
 
-func LambdaGenerateHandler(ctx context.Context, req1 *api.GenerateRequest) (*string, error) {
-	fmt.Println(req1)
-	d, _ := json.Marshal(req1)
-	req := *req1
-	fmt.Println(string(d))
+func LambdaGenerateHandler(ctx context.Context, request events.LambdaFunctionURLRequest) (*string, error) {
+	fmt.Println(request.Body)
+	fmt.Println(request.RawPath)
+	req := api.GenerateRequest{}
+	err := json.Unmarshal([]byte(request.Body), &req)
+	if err != nil {
+		return ptr(""), err
+	}
 	loaded.mu.Lock()
 	defer loaded.mu.Unlock()
 
