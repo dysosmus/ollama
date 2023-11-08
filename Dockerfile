@@ -9,6 +9,9 @@ RUN  apt-get install -y git build-essential cmake
 ADD https://dl.google.com/go/go1.21.3.linux-$TARGETARCH.tar.gz /tmp/go1.21.3.tar.gz
 RUN mkdir -p /usr/local && tar xz -C /usr/local </tmp/go1.21.3.tar.gz
 
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
 COPY . .
 ENV GOARCH=$TARGETARCH
 ENV GOFLAGS=$GOFLAGS
