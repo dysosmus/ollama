@@ -11,7 +11,7 @@ RUN mkdir -p /usr/local && tar xz -C /usr/local </tmp/go1.21.3.tar.gz
 
 COPY go.mod .
 COPY go.sum .
-RUN go mod download
+RUN /usr/local/go/bin/go mod download
 COPY . .
 ENV GOARCH=$TARGETARCH
 ENV GOFLAGS=$GOFLAGS
