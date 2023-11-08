@@ -33,6 +33,8 @@ func LambdaGenerateHandler(ctx context.Context, request events.LambdaFunctionURL
 	if err != nil {
 		var pErr *fs.PathError
 		if errors.As(err, &pErr) {
+			fmt.Println(PullModel(ctx, model.Name, &RegistryOptions{Insecure: true}, nil))
+
 			return ptr(""), fmt.Errorf("model '%s' not found, try pulling it first", req.Model)
 		}
 		return ptr(""), err
