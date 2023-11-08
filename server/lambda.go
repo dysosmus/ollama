@@ -33,7 +33,7 @@ func LambdaGenerateHandler(ctx context.Context, request events.LambdaFunctionURL
 	if err != nil {
 		var pErr *fs.PathError
 		if errors.As(err, &pErr) {
-			fmt.Println(PullModel(ctx, model.Name, &RegistryOptions{Insecure: true}, func(response api.ProgressResponse) {
+			fmt.Println(PullModel(ctx, req.Model, &RegistryOptions{Insecure: true}, func(response api.ProgressResponse) {
 
 			}))
 
